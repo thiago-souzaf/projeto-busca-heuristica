@@ -131,7 +131,6 @@ def astar (start_station, end_station):
                 # Soma 4 no gasto se estiver fazendo baldeação
                 if current_node.line_color and current_node.line_color != line_color: new_node.g += 4
 
-
                 new_node.h = calcularHeuristica(new_node.station, end_station)
 
                 new_node.f = new_node.g + new_node.h
@@ -140,16 +139,21 @@ def astar (start_station, end_station):
         
         # Verifica os children gerados
         for child in children:
+
+            # Boolean para determinar se o child vai ser inserido ou não na fronteira com base nos nós visitados e nós na fronteira
+            is_better = True
+            
             # Child já está nos nós visitados
             for node_visitado in visitados:
-                if child.station == node_visitado.station: continue
+                if child.station == node_visitado.station: is_better = False
 
             # Child já está na fronteira
             for node_fronteira in fronteira:
-                if child.station == node_fronteira.station and child.g > node_fronteira.g: continue
+                if child.station == node_fronteira.station and child.line_color == node_fronteira.line_color and child.g > node_fronteira.g:
+                    is_better = False
 
             # Insere os nós gerados na fronteira
-            fronteira.append(child)
+            if is_better: fronteira.append(child)
 
 
 def main():
