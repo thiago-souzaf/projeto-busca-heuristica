@@ -71,7 +71,6 @@ class Node:
     def __repr__(self):
         return f"(Estação: E{self.station+1}; f: {self.f}; g: {self.g};  Parent node: {self.parent}; cor da linha: {self.line_color})"
 
-
 def calcularHeuristica(estacao_atual, estacao_final) -> int:
     """ 
     Função para calcular a heurística da estacao atual até a estação destino seguindo uma linha reta.
@@ -93,6 +92,22 @@ def transformarKilometroEmMinutos(km):
     minutos = km*2
     return minutos
 
+def printarFronteira(fronteira):
+    print("Fronteira:")
+    for node in fronteira:
+        print(f"-> E{node.station+1} | f: {node.f:.1f} | g: {node.g:.1f} | Linha {get_color_name(node.line_color)} ")
+    print("-"*50)
+
+def get_color_name(color_number):
+    # Faz o mapeamento das cores com os índices
+    color_mapping = {
+        1: "Azul",
+        2: "Amarela",
+        3: "Verde",
+        4: "Vermelha"
+    }
+    return color_mapping.get(color_number, None)
+
 def astar (start_station, end_station):
     
     # Create start node
@@ -106,6 +121,7 @@ def astar (start_station, end_station):
     while len(fronteira) > 0:
         # Seleciona o primeiro nó da fronteira
         fronteira.sort(key=lambda x: x.f)
+        printarFronteira(fronteira)
         current_node = fronteira.pop(0)
         visitados.append(current_node)
         
@@ -158,14 +174,14 @@ def astar (start_station, end_station):
 
 def main():
 
-    # estacao_partida = int(input('Estação de partida: '))-1
-    # estacao_final = int(input('Estação destino: '))-1
+    estacao_partida = int(input('Digite um número entre 1 e 14 \n Estação de partida: '))-1
+    estacao_final = int(input('Digite um número entre 1 e 14 \nEstação destino: '))-1
 
-    start = 13
-    end = 1
-    path = astar(start, end)
-    print(path)
-
+    path = astar(estacao_partida, estacao_final)
+    print('Trajeto percorrido:')
+    for estacao,_ in path:
+        print(f'E{estacao} -> ', end='')
+    print(f"Tempo total {path[-1][1]} minutos")
 
 if __name__ == "__main__":
     main()
