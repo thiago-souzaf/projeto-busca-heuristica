@@ -6,14 +6,9 @@ class Node:
         self.station = station
         self.line_color = line_color
 
-        self.g = 0
-        self.h = 0
+        self.g = 0 # custo
+        self.h = 0 # heuristica
         self.f = 0
-
-    def __str__(self):
-        return f"(Estação: E{self.station+1}; f: {self.f}; g: {self.g};  Parent node: {self.parent}; cor da linha: {self.line_color})"
-    def __repr__(self):
-        return f"(Estação: E{self.station+1}; f: {self.f}; g: {self.g};  Parent node: {self.parent}; cor da linha: {self.line_color})"
 
 def calcularHeuristica(estacao_atual, estacao_final) -> int:
     """ 
@@ -52,10 +47,7 @@ def get_color_name(color_number):
     }
     return color_mapping.get(color_number, None)
 
-def astar (start_station, end_station):
-    
-    # Create start node
-    start_node = Node(start_station, None, None)
+def astar (start_node, end_station):
 
     fronteira = []
     visitados = []
@@ -107,7 +99,7 @@ def astar (start_station, end_station):
             for node_visitado in visitados:
                 if child.station == node_visitado.station: is_better = False
 
-            # Child já está na fronteira
+            # Child já está na fronteira, chegando na mesma linha
             for node_fronteira in fronteira:
                 if child.station == node_fronteira.station and child.line_color == node_fronteira.line_color and child.g > node_fronteira.g:
                     is_better = False
@@ -118,10 +110,15 @@ def astar (start_station, end_station):
 
 def main():
 
-    estacao_partida = int(input('Digite um número entre 1 e 14 \n Estação de partida: '))-1
-    estacao_final = int(input('Digite um número entre 1 e 14 \nEstação destino: '))-1
+    estacao_partida = int(input('(Digite um número entre 1 e 14) \nEstação de partida: '))-1
+    print('LINHAS')
+    for i in range(1,5):
+        print(f"{i} -> {get_color_name(i)}")
+    linha_partida = int(input('Digite a sua linha atual: '))
+    estacao_final = int(input('(Digite um número entre 1 e 14) \nEstação destino: '))-1
 
-    path = astar(estacao_partida, estacao_final)
+    node_partida = Node(estacao_partida, None, linha_partida)
+    path = astar(node_partida, estacao_final)
     print('Trajeto percorrido:')
     for estacao,_ in path:
         print(f'E{estacao} -> ', end='')
