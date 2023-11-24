@@ -1,4 +1,5 @@
 from matrizes import H, D, L
+import gui
 
 class Node:
     def __init__(self, station, parent, line_color):
@@ -6,9 +7,10 @@ class Node:
         self.station = station
         self.line_color = line_color
 
-        self.g = 0 # custo
-        self.h = 0 # heuristica
+        self.g = 0  # custo
+        self.h = 0  # heuristica
         self.f = 0
+
 
 def calcularHeuristica(estacao_atual, estacao_final) -> int:
     """ 
@@ -26,29 +28,32 @@ def calcularHeuristica(estacao_atual, estacao_final) -> int:
     min = transformarKilometroEmMinutos(km)
     return min
 
+
 def transformarKilometroEmMinutos(km):
     # Considera velocidade média de 30km/h
-    minutos = km*2
+    minutos = km * 2
     return minutos
+
 
 def printarFronteira(fronteira):
     print("Fronteira:")
     for node in fronteira:
-        print(f"-> E{node.station+1} | f: {node.f:.1f} | g: {node.g:.1f} | Linha {get_color_name(node.line_color)} ")
-    print("-"*50)
+        print(f"-> E{node.station + 1} | f: {node.f:.1f} | g: {node.g:.1f} | Linha {get_color_name(node.line_color)} ")
+    print("-" * 50)
+
 
 def get_color_name(color_number):
     # Faz o mapeamento das cores com os índices
     color_mapping = {
-        1: "Azul",
+        1 : "Azul",
         2: "Amarela",
         3: "Verde",
         4: "Vermelha"
     }
     return color_mapping.get(color_number, None)
 
-def astar (start_node, end_station):
 
+def astar(start_node, end_station):
     fronteira = []
     visitados = []
 
@@ -60,21 +65,19 @@ def astar (start_node, end_station):
         printarFronteira(fronteira)
         current_node = fronteira.pop(0)
         visitados.append(current_node)
-        
 
         # Testa se o nó selecionado é estado final
         if current_node.station == end_station:
             path = []
             current = current_node
             while current is not None:
-                path.append((current.station+1, current.g))
+                path.append((current.station + 1, current.g))
                 current = current.parent
-            return path[::-1] # Return reversed path
-        
+            return path[::-1]  # Return reversed path
 
         # Gera um novo conjunto de estados
         children = []
-        for i in range (14):
+        for i in range(14):
             line_color = L[current_node.station][i]
             if line_color != 0:
                 new_node = Node(i, current_node, line_color)
@@ -88,13 +91,13 @@ def astar (start_node, end_station):
                 new_node.f = new_node.g + new_node.h
 
                 children.append(new_node)
-        
+
         # Verifica os children gerados
         for child in children:
 
             # Boolean para determinar se o child vai ser inserido ou não na fronteira com base nos nós visitados e nós na fronteira
             is_better = True
-            
+
             # Child já está nos nós visitados
             for node_visitado in visitados:
                 if child.station == node_visitado.station: is_better = False
@@ -108,21 +111,16 @@ def astar (start_node, end_station):
             if is_better: fronteira.append(child)
 
 
-def main():
-
-    estacao_partida = int(input('(Digite um número entre 1 e 14) \nEstação de partida: '))-1
-    print('LINHAS')
-    for i in range(1,5):
-        print(f"{i} -> {get_color_name(i)}")
-    linha_partida = int(input('Digite a sua linha atual: '))
-    estacao_final = int(input('(Digite um número entre 1 e 14) \nEstação destino: '))-1
+def inicio(ini,fim,cor):
+    estacao_partida = int(ini)-1
+    linha_partida = cor
+    estacao_final = int(fim)-1
 
     node_partida = Node(estacao_partida, None, linha_partida)
     path = astar(node_partida, estacao_final)
     print('Trajeto percorrido:')
-    for estacao,_ in path:
-        print(f'E{estacao} -> ', end='')
+    lista = []
+    for estacao, _ in path:
+        lista.append(estacao)
     print(f"Tempo total {path[-1][1]} minutos")
-
-if __name__ == "__main__":
-    main()
+    return [path[-1][1], lista]
